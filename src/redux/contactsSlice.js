@@ -1,19 +1,71 @@
-import { createSlice } from "@reduxjs/toolkit";
+//* Redux
+import { createSelector, createSlice } from "@reduxjs/toolkit";
+import { fetchContacts, addContact, deleteContact } from "./contactsOps";
 
+//* Slice
 const slice = createSlice({
   name: "contacts",
   initialState: {
     items: [],
+    isLoading: false,
+    error: null,
   },
-  reducers: {
-    addContact: (state, action) => {
+  extraReducers: (builder) => {
+    // Fetch contacts
+    builder.addCase(fetchContacts.pending, (state, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(fetchContacts.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.error = null;
+      state.items = action.payload;
+    });
+    builder.addCase(fetchContacts.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload;
+    });
+
+    // Add contact
+    builder.addCase(addContact.pending, (state, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(addContact.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.error = null;
       state.items.push(action.payload);
-    },
-    deleteContact: (state, action) => {
-      state.items = state.items.filter((el) => el.id !== action.payload);
-    },
+    });
+    builder.addCase(addContact.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload;
+    });
+
+    // Delete contact
+    builder.addCase(deleteContact.pending, (state, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(deleteContact.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.error = null;
+      state.items = state.items.filter((el) => el.id !== action.payload.id);
+    });
+    builder.addCase(deleteContact.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload;
+    });
   },
 });
 
-export const { addContact, deleteContact } = slice.actions;
 export default slice.reducer;
+
+//* Selectors
+import { selectNameFilter } from "./filtersSlice";
+export const selectContacts = (state) => state.contacts.items;
+export const selectIsLoading = (state) => state.contacts.isLoading;
+export const selectError = (state) => state.contacts.error;
+
+export const selectFilteredContacts = createSelector(
+  [selectContacts, selectNameFilter],
+  (contacts, nameFilter) => {
+    return contacts.filter((el) => el.name.includes(nameFilter));
+  }
+);

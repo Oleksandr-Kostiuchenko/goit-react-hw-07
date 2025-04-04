@@ -19,14 +19,6 @@ import {
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
-const persistedContactsReducer = persistReducer(
-  {
-    key: "contacts",
-    storage,
-  },
-  contactsReducer
-);
-
 const persistedFavsReducer = persistReducer(
   {
     key: "favorites",
@@ -37,7 +29,7 @@ const persistedFavsReducer = persistReducer(
 
 export const store = configureStore({
   reducer: {
-    contacts: persistedContactsReducer,
+    contacts: contactsReducer,
     filters: filterReducer,
     fav: persistedFavsReducer,
   },

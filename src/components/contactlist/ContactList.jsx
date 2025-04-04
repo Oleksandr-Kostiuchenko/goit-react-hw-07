@@ -3,29 +3,15 @@ import style from "./ContactList.module.css";
 import toast, { Toaster } from "react-hot-toast";
 import { AnimatePresence, motion } from "framer-motion";
 
-//* Redux
-import { useSelector, useDispatch } from "react-redux";
-
 //* Components
 import Contact from "../contact/Contact";
 
-const getVisibleContacts = (contactsData, name) => {
-  if (name.trim() === "") {
-    return contactsData;
-  }
-  return contactsData.filter((el) => el.name.includes(name));
-};
+//* Redux
+import { useSelector } from "react-redux";
+import { selectFilteredContacts } from "../../redux/contactsSlice";
 
 const ContactList = () => {
-  const contactsData = useSelector((state) => state.contacts);
-  const filterData = useSelector((state) => state.filters.name);
-
-  const visibleContacts = getVisibleContacts(contactsData.items, filterData);
-
-  const notifySuccessRemoove = (personName) =>
-    toast.success(`${personName} is successfully deleted!`, {
-      icon: "❌",
-    });
+  const visibleContacts = useSelector(selectFilteredContacts);
 
   return (
     <>
@@ -39,10 +25,7 @@ const ContactList = () => {
               exit={{ opacity: 0, y: -50 }}
               transition={{ duration: 0.4 }}
             >
-              <Contact
-                contactData={el}
-                notifySuccessRemoove={notifySuccessRemoove}
-              />
+              <Contact contactData={el} />
             </motion.li>
           ))}
         </AnimatePresence>

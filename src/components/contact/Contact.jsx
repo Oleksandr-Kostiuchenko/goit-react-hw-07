@@ -6,20 +6,41 @@ import { FaRegHeart } from "react-icons/fa";
 import { FaHeart } from "react-icons/fa6";
 
 //* Redux
-import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteContact } from "../../redux/contactsSlice";
+import { selectError } from "../../redux/contactsSlice";
+import { selectFavContacts } from "../../redux/favSlice";
+import { deleteContact } from "../../redux/contactsOps";
 import { addFav } from "../../redux/favSlice";
 import { deleteFav } from "../../redux/favSlice";
 
-const Contact = ({ contactData, notifySuccessRemoove }) => {
+//* Notifier
+const notifySuccessRemoove = (personName) =>
+  toast.success(`${personName} is successfully deleted!`, {
+    icon: "❌",
+  });
+
+const notifyFailure = () =>
+  toast.success(`Sorry! Something went wrong...`, {
+    icon: "❌",
+  });
+
+const Contact = ({ contactData }) => {
   const dispatch = useDispatch();
-  const favInfo = useSelector((state) => state.fav.items);
+  const errorData = useSelector(selectError);
+  const favInfo = useSelector(selectFavContacts);
   const isFav = favInfo.some((fav) => fav.id === contactData.id);
 
-  const handleDelete = () => {
-    dispatch(deleteContact(contactData.id));
-    notifySuccessRemoove(contactData.name);
+  const handleDelete = async () => {
+    try {
+      await dispatch(deleteContact(contactData.id)).unwrap();
+      dispatch(deleteFav(contactData.id));
+
+      if (!errorData) {
+        notifySuccessRemoove(contactData.name);
+      }
+    } catch (error) {
+      notifyFailure();
+    }
   };
 
   const handleToggleFav = () => {

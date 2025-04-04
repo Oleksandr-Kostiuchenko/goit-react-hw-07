@@ -7,8 +7,9 @@ import { nanoid } from "nanoid";
 import toast, { Toaster } from "react-hot-toast";
 
 // * Redux
-import { useDispatch } from "react-redux";
-import { addContact } from "../../redux/contactsSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { selectError } from "../../redux/contactsSlice";
+import { addContact } from "../../redux/contactsOps";
 
 //* Formik
 import * as Yup from "yup";
@@ -24,43 +25,36 @@ const validationSchema = Yup.object().shape({
     .required("A phone number is required"),
 });
 
-//* Random color
-const randomColorsArr = [
-  "#A3C4BC",
-  "#C3B299",
-  "#D4A5A5",
-  "#A5A5D4",
-  "#D4C5A5",
-  "#A5D4C5",
-  "#C5A5D4",
-  "#D4A5C5",
-  "#A5D4A5",
-  "#C5D4A5",
-];
-const colorGenerator = () => {
-  return randomColorsArr[
-    Math.ceil(Math.random(0, randomColorsArr.length - 1) * 10)
-  ];
-};
+//* Notifier
+const notifySuccessAdd = (personName) =>
+  toast.success(`${personName} is successfully added!`);
+
+const notifyFailure = () =>
+  toast.success(`Sorry! Something went wrong...`, {
+    icon: "❌",
+  });
 
 const ContactForm = () => {
+  const errorData = useSelector(selectError);
   const dispatch = useDispatch();
 
-  const onFormSubmit = (formData, actions) => {
-    dispatch(
-      addContact({
-        ...formData,
-        color: colorGenerator(),
-        id: `${nanoid(16)}`,
-      })
-    );
+  const onFormSubmit = async (formData, actions) => {
+    try {
+      await dispatch(
+        addContact({
+          ...formData,
+          id: `${nanoid(16)}`,
+        })
+      ).unwrap();
 
-    notifySuccessAdd(formData.name);
-    actions.resetForm();
+      if (!errorData) {
+        notifySuccessAdd(formData.name);
+      }
+      actions.resetForm();
+    } catch (error) {
+      notifyFailure();
+    }
   };
-
-  const notifySuccessAdd = (personName) =>
-    toast.success(`${personName} is successfully added!`);
 
   return (
     <>

@@ -5,22 +5,13 @@ import { AnimatePresence, motion } from "framer-motion";
 
 //* Redux
 import { useSelector, useDispatch } from "react-redux";
+import { selectVisibleFavContacts } from "../../redux/favSlice";
 
 //* Components
 import Contact from "../contact/Contact";
 
-const getVisibleContacts = (contactsData, name) => {
-  if (name.trim() === "") {
-    return contactsData;
-  }
-  return contactsData.filter((el) => el.name.includes(name));
-};
-
 const FavList = () => {
-  const contactsData = useSelector((state) => state.fav);
-  const filterData = useSelector((state) => state.filters.name);
-
-  const visibleContacts = getVisibleContacts(contactsData.items, filterData);
+  const visibleContacts = useSelector(selectVisibleFavContacts);
 
   const notifySuccessRemoove = (personName) =>
     toast.success(`${personName} is successfully deleted!`, {

@@ -1,10 +1,4 @@
-//* Libraries
 import style from "./App.module.css";
-import { useState, useEffect, useId } from "react";
-import { motion } from "framer-motion";
-import { MdAccountCircle } from "react-icons/md";
-import { GoPencil } from "react-icons/go";
-import { BiSolidPencil } from "react-icons/bi";
 
 //* Pages
 import ContactsPage from "./pages/ContactsPage/ContactsPage";
